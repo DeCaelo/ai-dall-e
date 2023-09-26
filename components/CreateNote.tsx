@@ -11,11 +11,41 @@ import {
 import { Plus } from 'lucide-react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
+import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
 
 type Props = {};
 
 const CreateNote = (props: Props) => {
   const [input, setInput] = React.useState('');
+
+  const createNote = useMutation({
+    mutationFn: async () => {
+      const response = await axios.post('/api/createNote', {
+        name: input,
+      });
+      return response.data;
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (input === '') {
+      window.alert('Please enter a name for your note');
+      return;
+    }
+    createNote.mutate(undefined, {
+      onSuccess: ({ note_id }) => {
+        console.log('created new note:', { note_id });
+        // hit another endpoint to uplod the temp dalle url to permanent firebase url
+      },
+      onError: (error) => {
+        console.error(error);
+        window.alert('Failed to create new note');
+      },
+    });
+  };
+
   return (
     <Dialog>
       <DialogTrigger>
@@ -31,7 +61,7 @@ const CreateNote = (props: Props) => {
             You can create a new note by clicking the button below.
           </DialogDescription>
         </DialogHeader>
-        <form>
+        <form onSubmit={handleSubmit}>
           <Input
             value={input}
             placeholder="Name..."
