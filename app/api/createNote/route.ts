@@ -18,31 +18,31 @@ export async function POST(req: Request) {
   const image_description = await generateImagePrompt(name);
   console.log('image_description', image_description);
 
-  return new NextResponse('ok', { status: 200 });
-  // if (!image_description) {
-  //   return new NextResponse('failed to generate image description', {
-  //     status: 500,
-  //   });
-  // }
-  // const image_url = await generateImage(image_description);
-  // if (!image_url) {
-  //   return new NextResponse('failed to generate image ', {
-  //     status: 500,
-  //   });
-  // }
+  if (!image_description) {
+    return new NextResponse('failed to generate image description', {
+      status: 500,
+    });
+  }
+  const image_url = await generateImage(image_description);
+  if (!image_url) {
+    return new NextResponse('failed to generate image ', {
+      status: 500,
+    });
+  }
 
-  // const note_ids = await db
-  //   .insert(notes)
-  //   .values({
-  //     name,
-  //     userId,
-  //     imageUrl: image_url,
-  //   })
-  //   .returning({
-  //     insertedId: notes.id,
-  //   });
+  const note_ids = await db
+    .insert(notes)
+    .values({
+      name,
+      userId,
+      imageUrl: image_url,
+      imageDescription: image_description,
+    })
+    .returning({
+      insertedId: notes.id,
+    });
 
-  // return NextResponse.json({
-  //   note_id: note_ids[0].insertedId,
-  // });
+  return NextResponse.json({
+    note_id: note_ids[0].insertedId,
+  });
 }
