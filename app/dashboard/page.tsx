@@ -33,7 +33,7 @@ const DashboardPage = (props: Props) => {
       </div>
 
       <div className="text-center">
-        <h2 className="text-xl ">You have no notes yet.</h2>
+        <h2 className="text-xl">You have no notes yet.</h2>
       </div>
     </div>
   );

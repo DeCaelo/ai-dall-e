@@ -20,10 +20,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body
-          className={clsx(
-            'flex min-h-screen flex-col items-center justify-between p-24 bg-theme-base text-theme-700',
-            inter.className
-          )}
+          className={clsx('p-24 bg-theme-base text-theme-700', inter.className)}
         >
           <div className="w-full max-w-lg">
             <div className="absolute top-0 -left-4 w-72 h-72 bg-green-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
