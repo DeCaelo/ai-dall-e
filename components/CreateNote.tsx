@@ -8,16 +8,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './ui/dialog';
-import { Plus } from 'lucide-react';
+import { Loader, Plus } from 'lucide-react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 type Props = {};
 
 const CreateNote = (props: Props) => {
+  const router = useRouter();
   const [input, setInput] = React.useState('');
+  const uploadToFirebase = useMutation({
+    mutationFn: async (noteId: string) => {
+      const response = await axios.post('/api/uploadToFirebase', {
+        noteId,
+      });
+      return response.data;
+    },
+  });
 
   const createNote = useMutation({
     mutationFn: async () => {
@@ -37,7 +47,10 @@ const CreateNote = (props: Props) => {
     createNote.mutate(undefined, {
       onSuccess: ({ note_id }) => {
         console.log('created new note:', { note_id });
+        router.push(`/notebook/${note_id}`);
         // hit another endpoint to uplod the temp dalle url to permanent firebase url
+        uploadToFirebase.mutate(note_id);
+        router.push(`/notebook/${note_id}`);
       },
       onError: (error) => {
         console.error(error);
@@ -72,7 +85,12 @@ const CreateNote = (props: Props) => {
             <Button type="reset" intent={'outline'}>
               Cancel
             </Button>
-            <Button type="submit">Create</Button>
+            <Button type="submit" disabled={createNote.isLoading}>
+              {createNote.isLoading && (
+                <Loader className="w-4 h-4 mr-2 animate-spin" />
+              )}
+              Create
+            </Button>
           </div>
         </form>
       </DialogContent>

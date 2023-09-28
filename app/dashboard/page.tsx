@@ -18,7 +18,6 @@ const DashboardPage = async (props: Props) => {
     .select()
     .from(notes)
     .where(eq(notes.userId, userId!));
-  console.log(allNotes);
 
   return (
     <div className="min-h-screen">
@@ -44,9 +43,11 @@ const DashboardPage = async (props: Props) => {
         <div className="h-8"></div>
       </div>
 
-      <div className="text-center">
-        <h2 className="text-xl">You have no notes yet.</h2>
-      </div>
+      {allNotes.length === 0 && (
+        <div className="text-center">
+          <h2 className="text-xl text-gray-500">You have no notes yet.</h2>
+        </div>
+      )}
 
       <div className="grid sm:grid-cols-3 md:grid-cols-5 grid-cols-1 gap-3">
         <CreateNote />
