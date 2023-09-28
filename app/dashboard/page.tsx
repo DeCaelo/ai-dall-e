@@ -1,14 +1,25 @@
 import CreateNote from '@/components/CreateNote';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { UserButton } from '@clerk/nextjs';
+import { db } from '@/lib/db';
+import { notes } from '@/lib/db/schema';
+import { UserButton, auth } from '@clerk/nextjs';
+import { eq } from 'drizzle-orm';
 import { ArrowLeft } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
 type Props = {};
 
-const DashboardPage = (props: Props) => {
+const DashboardPage = async (props: Props) => {
+  const { userId } = auth();
+  const allNotes = await db
+    .select()
+    .from(notes)
+    .where(eq(notes.userId, userId!));
+  console.log(allNotes);
+
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto p-10">
@@ -39,6 +50,27 @@ const DashboardPage = (props: Props) => {
 
       <div className="grid sm:grid-cols-3 md:grid-cols-5 grid-cols-1 gap-3">
         <CreateNote />
+        {allNotes.map((note) => {
+          return (
+            <a href={`/notebook/${note.id}`} key={note.id}>
+              <div className="border rounded-lg overflow-hidden flex flex-col hover:shadow-xl transition hover:-translate-y-1">
+                <Image
+                  width={400}
+                  height={200}
+                  alt={note.name}
+                  src={note.imageUrl || ''}
+                />
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold">{note.name}</h3>
+                  <div className="h-1"></div>
+                  <p className="text-sm">
+                    {new Date(note.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </a>
+          );
+        })}
       </div>
     </div>
   );
